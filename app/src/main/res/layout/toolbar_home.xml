@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/blue_grey_900"
+    android:contextClickable="true"
+    android:orientation="vertical"
+    app:contentInsetStartWithNavigation="0dp"
+    app:layout_scrollFlags="scroll|enterAlways"
+    app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+    app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+    app:titleTextColor="@color/white">
+
+    <ImageView
+        android:layout_width="@dimen/toolbar_default_size"
+        android:layout_height="@dimen/toolbar_default_size"
+        android:layout_gravity="end|center"
+        android:layout_marginEnd="@dimen/spacing_large"
+        android:src="@mipmap/saving_people"
+        android:tint="@color/green_300" />
+
+</androidx.appcompat.widget.Toolbar>

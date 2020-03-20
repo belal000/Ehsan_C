@@ -1,0 +1,45 @@
+<resources>
+    <string name="app_name">Ehsan Charities</string>
+    <string name="login">Login</string>
+    <string name="new_user">New user?</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="email_address">Email Address</string>
+    <string name="password">Password</string>
+    <string name="next">Next</string>
+    <string name="skip">Skip</string>
+    <string name="start">Start</string>
+    <string name="already_user">Already user ?</string>
+    <string name="valid_email">Enter a Valid Email.</string>
+    <string name="cannot_be_empty">Cannot be null or empty.</string>
+    <string name="at_least_three_character">At least three characters.</string>
+    <string name="at_least_six_character">At least six characters.</string>
+    <string name="successfully_sign_up">Thanks! your account has been successfully created.</string>
+    <string name="error_sign_up">Oops, something went wrong!</string>
+    <string name="authentication_failed">Authentication Failed</string>
+    <string name="charity_name">Charity Name</string>
+    <string name="charity_address">Charity Address</string>
+    <string name="charity_phone_number">Charity Phone Number</string>
+    <string name="add_images">Add Images</string>
+    <string name="firebase_charities">charities</string>
+    <string name="more_than_one_image">You must select more than one image.</string>
+    <string name="you_have_selected">You have selected</string>
+    <string name="images">Images</string>
+    <string name="uploading">Uploding...</string>
+    <string name="failed">Failed</string>
+    <string name="confrim_exit">Please click BACK again to exit.</string>
+    <string name="you_are_not_charity">You are not Charity.</string>
+    <string name="home">Home</string>
+    <string name="sign_out">Sign out</string>
+    <string name="navigation_drawer_open">open</string>
+    <string name="navigation_drawer_close">close</string>
+    <string name="set_profile_picture">Set Profile Picture</string>
+    <string name="uploaded">Uploaded.</string>
+    <string name="upload_image">Image uploaded successfully.</string>
+    <string name="try_again">Try Again.</string>
+    <string name="firebase_donations">donations</string>
+    <string name="cannot_call">Cannot call now.</string>
+    <string name="donations_charities">Donations Charities</string>
+    <string name="no_gmail">Gmail App is not installed</string>
+
+
+</resources>
