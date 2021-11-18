@@ -144,22 +144,55 @@
                         android:textColor="@color/blue_grey_500"
                         android:textStyle="bold" />
 
-                    <androidx.appcompat.widget.AppCompatEditText
-                        android:id="@+id/charity_address_edittext"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="-4dp"
-                        android:layout_marginRight="-4dp"
-                        android:inputType="textPersonName"
-                        android:maxLength="50"
-                        android:maxLines="1"
-                        android:singleLine="true"
-                        android:textColor="@color/blue_grey_300"
-                        android:theme="@style/EditText.Grey" />
+
+
+
+
+
+                        <androidx.appcompat.widget.AppCompatEditText
+                            android:id="@+id/charity_address_edittext"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="-4dp"
+                            android:layout_marginRight="-4dp"
+                            android:inputType="textPersonName"
+                            android:maxLength="50"
+                            android:maxLines="1"
+                            android:singleLine="true"
+                            android:textColor="@color/blue_grey_300"
+                            android:theme="@style/EditText.Grey" />
+
+
 
                     <View
                         android:layout_width="0dp"
                         android:layout_height="@dimen/spacing_large" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/add_location_in_map"
+                        android:textAlignment="center"
+                        android:textAppearance="@style/Base.TextAppearance.AppCompat.Small"
+                        android:textColor="@color/blue_grey_500"
+                        android:textStyle="bold" />
+
+
+
+
+                    <ImageButton
+                        android:id="@+id/add_loc"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:background="@color/blue_grey_900"
+                        android:src="@drawable/ic_add_location_24"
+                        android:layout_marginTop="10dp"/>
+
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/spacing_large"
+                        />
 
 
                     <TextView
@@ -187,8 +220,6 @@
                     <View
                         android:layout_width="0dp"
                         android:layout_height="@dimen/spacing_medium" />
-
-
 
 
                     <Button

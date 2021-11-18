@@ -22,6 +22,9 @@ public class DonationsViewHolder extends RecyclerView.ViewHolder {
     public ImageButton callDonator;
     public ImageButton emailDonator;
     public ImageButton deleteDonator;
+    public ImageButton loc_donation;
+
+
 
 
     public DonationsViewHolder(@NonNull View itemView) {
@@ -35,5 +38,6 @@ public class DonationsViewHolder extends RecyclerView.ViewHolder {
         callDonator = itemView.findViewById(R.id.call_donation);
         emailDonator = itemView.findViewById(R.id.email_donation);
         deleteDonator = itemView.findViewById(R.id.delete_donation);
+        loc_donation=itemView.findViewById(R.id.loc_donation);
     }
 }

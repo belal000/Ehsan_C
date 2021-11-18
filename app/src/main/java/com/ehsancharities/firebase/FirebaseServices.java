@@ -5,13 +5,17 @@ import android.content.Intent;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.ehsancharities.AdminActivity;
 import com.ehsancharities.R;
 import com.ehsancharities.home.MainActivity;
+import com.ehsancharities.login.LoginActivity;
 import com.ehsancharities.model.Charity;
+import com.ehsancharities.utils.Session;
 import com.ehsancharities.utils.Tools;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -20,6 +24,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 
@@ -89,25 +94,17 @@ public class FirebaseServices {
     }
 
     public void addNewCharity(Charity charity, final ProgressBar signUpLoading) {
-        Map<String, Object> newCharity = new HashMap<>();
-        newCharity.put("charityID", charity.getCharityID());
-        newCharity.put("charityName", charity.getCharityName().trim());
-        newCharity.put("charityEmail", charity.getCharityEmail().trim());
-        newCharity.put("charityAddress", charity.getCharityAddress().trim());
-        newCharity.put("charityPhoneNumber", charity.getCharityPhoneNumber().trim());
-        newCharity.put("chairtyImage" , "empty");
-        newCharity.put("accountType", "Charity");
 
 
         firebaseFirestore.collection(context.getString(R.string.firebase_charities)).document(this.userID)
-                .set(newCharity)
+                .set(charity)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         Log.d(TAG, "DocumentSnapshot successfully written!");
                         Tools.showMessage(context, context.getString(R.string.successfully_sign_up));
                         signUpLoading.setVisibility(View.GONE);
-                        Intent intent = new Intent(context, MainActivity.class);
+                        Intent intent = new Intent(context, LoginActivity.class);
                         context.startActivity(intent);
                         ((AppCompatActivity) context).finish();
 
@@ -132,10 +129,46 @@ public class FirebaseServices {
                     public void onComplete(@NonNull Task<AuthResult> task) {
 
                         if (task.isSuccessful()) {
-                            Intent intent = new Intent(context, MainActivity.class);
-                            context.startActivity(intent);
-                            ((AppCompatActivity) context).finish();
-                            loginLoading.setVisibility(View.GONE);
+
+
+                            firebaseFirestore.collection(context.getString(R.string.firebase_charities)).document(firebaseAuth.getCurrentUser().getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+
+                                    Long stateAccount = task.getResult().get("stateAccount") == null ? 0 : (Long) task.getResult().get("stateAccount");
+
+
+                                    String typeAccount = task.getResult().get("accountType").toString();
+
+                                    Session.getInstance().setTYPE_ACCOUNT(context, typeAccount);
+
+                                    if (typeAccount.equals("Admin")) {
+
+                                        Intent intent = new Intent(context, AdminActivity.class);
+                                        context.startActivity(intent);
+                                        ((AppCompatActivity) context).finish();
+
+
+                                    }
+
+
+                                    if (stateAccount == 0)
+                                        Toast.makeText(context, " Please wait for your request to be approved", Toast.LENGTH_LONG).show();
+                                    else {
+
+
+                                        Intent intent = new Intent(context, MainActivity.class);
+                                        context.startActivity(intent);
+                                        ((AppCompatActivity) context).finish();
+
+
+                                    }
+
+                                    loginLoading.setVisibility(View.GONE);
+
+                                }
+                            });
+
 
                         } else {
                             Tools.showMessage(context, context.getString(R.string.authentication_failed));

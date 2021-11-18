@@ -1,5 +1,6 @@
 package com.ehsancharities.sign_up;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
@@ -11,6 +12,7 @@ import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,12 +20,14 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.ehsancharities.MapsActivity;
 import com.ehsancharities.R;
 import com.ehsancharities.firebase.FirebaseServices;
 import com.ehsancharities.login.LoginActivity;
 import com.ehsancharities.model.Charity;
 import com.ehsancharities.utils.Const;
 import com.ehsancharities.utils.Tools;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
@@ -37,6 +41,7 @@ import java.util.ArrayList;
 
 public class SignUpActivity extends AppCompatActivity implements View.OnClickListener {
 
+    private ImageButton add_loc;
     private EditText charityName, email, password, charityAddress, charityPhoneNumber;
     private TextView login;
     private Button signUpBtn;
@@ -46,6 +51,8 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     private DocumentReference documentReference;
     private ProgressBar signUpLoading;
     private static final String TAG = "SignUpActivity";
+
+    public static LatLng latLng;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +90,9 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         signUpBtn = findViewById(R.id.sign_up_btn);
         signUpBtn.setOnClickListener(this);
 
+        add_loc=findViewById(R.id.add_loc);
+        add_loc.setOnClickListener(this);
+
         signUpLoading = findViewById(R.id.sign_up_loading);
 
         storage = FirebaseStorage.getInstance();
@@ -107,7 +117,9 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
         boolean valid = true;
 
+
         String inputEmail = email.getText().toString();
+
         if (inputEmail.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(inputEmail).matches()) {
             email.setError(getString(R.string.valid_email));
             valid = false;
@@ -179,8 +191,16 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                 signUp();
 
                 break;
+
+            case R.id.add_loc:
+                selectLocation();
+                break;
         }
 
+    }
+    private void selectLocation() {
+
+        startActivity(new Intent(getBaseContext() , MapsActivity.class));
     }
 
     private void backToLogin() {
@@ -207,6 +227,10 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         charity.setCharityEmail(email.getText().toString());
         charity.setCharityAddress(charityAddress.getText().toString());
         charity.setCharityPhoneNumber(charityPhoneNumber.getText().toString());
+        charity.setLat(latLng.latitude);
+        charity.setLng(latLng.longitude);
+        charity.setStateAccount(0);
+        charity.setAccountType("Charity");
         return charity;
     }
 
@@ -234,6 +258,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
         }
 
+        @SuppressLint("NonConstantResourceId")
         @Override
         public void afterTextChanged(Editable editable) {
 

@@ -40,6 +40,9 @@
     <string name="cannot_call">Cannot call now.</string>
     <string name="donations_charities">Donations Charities</string>
     <string name="no_gmail">Gmail App is not installed</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="set_location">Set Location</string>
+    <string name="add_location_in_map">Add location in Map</string>
 
 
 </resources>

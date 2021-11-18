@@ -12,6 +12,34 @@ public class Charity
     private String charityPhoneNumber;
     private String chairtyImage;
     private String accountType;
+   private int stateAccount;
+
+    public int getStateAccount() {
+        return stateAccount;
+    }
+
+    public void setStateAccount(int stateAccount) {
+        this.stateAccount = stateAccount;
+    }
+
+    private double lat;
+    private double lng;
+
+    public double getLat() {
+        return lat;
+    }
+
+    public void setLat(double lat) {
+        this.lat = lat;
+    }
+
+    public double getLng() {
+        return lng;
+    }
+
+    public void setLng(double lng) {
+        this.lng = lng;
+    }
 
     public Charity() {
     }

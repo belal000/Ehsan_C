@@ -34,7 +34,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:background="@color/blue_grey_900"
-                        android:scaleType="centerCrop" />
+                        android:scaleType="fitXY"
+
+                        />
 
                     <ProgressBar
                         android:id="@+id/donate_image_load"
@@ -69,7 +71,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="monospace"
                         android:gravity="start"
-                        android:text="Saif Jaradat"
+                        android:text="Belal jaradat"
                         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                         android:textColor="@color/blue_grey_900"
                         android:textStyle="bold" />
@@ -119,6 +121,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="end">
+                <ImageButton
+                    android:id="@+id/loc_donation"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_margin="10dp"
+                    android:background="?android:selectableItemBackground"
+                    android:scaleType="fitXY"
+                    android:tint="@color/blue_grey_900"
+                    android:src="@drawable/ic_location_on_24" />
 
                 <ImageButton
                     android:id="@+id/call_donation"

@@ -6,10 +6,12 @@ import android.os.Handler;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.ehsancharities.AdminActivity;
 import com.ehsancharities.R;
 import com.ehsancharities.home.MainActivity;
 import com.ehsancharities.login.LoginActivity;
 import com.ehsancharities.utils.Const;
+import com.ehsancharities.utils.Session;
 import com.ehsancharities.utils.Tools;
 
 public class SplashScreenActivity extends AppCompatActivity {
@@ -29,9 +31,16 @@ public class SplashScreenActivity extends AppCompatActivity {
             @Override
             public void run() {
 
-                Intent mainIntent = new Intent(SplashScreenActivity.this, MainActivity.class);
-                SplashScreenActivity.this.startActivity(mainIntent);
-                SplashScreenActivity.this.finish();
+                if (Session.getInstance().getTYPE_ACCOUNT(getApplicationContext()).equals("Admin")) {
+                    Intent mainIntent = new Intent(SplashScreenActivity.this, AdminActivity.class);
+                    SplashScreenActivity.this.startActivity(mainIntent);
+                    SplashScreenActivity.this.finish();
+                } else {
+
+                    Intent mainIntent = new Intent(SplashScreenActivity.this, MainActivity.class);
+                    SplashScreenActivity.this.startActivity(mainIntent);
+                    SplashScreenActivity.this.finish();
+                }
             }
         }, Const.SPLASH_DISPLAY_LENGTH);
     }

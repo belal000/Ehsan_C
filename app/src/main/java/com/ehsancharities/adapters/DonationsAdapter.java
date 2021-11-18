@@ -11,16 +11,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.ehsancharities.MapsActivity;
 import com.ehsancharities.R;
 import com.ehsancharities.holders.DonationsViewHolder;
 import com.ehsancharities.model.Donation;
 import com.ehsancharities.utils.Const;
 import com.ehsancharities.utils.Tools;
 import com.ehsancharities.utils.UniversalImageLoader;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.List;
 
@@ -81,8 +86,33 @@ public class DonationsAdapter extends RecyclerView.Adapter<DonationsViewHolder> 
             @Override
             public void onClick(View view) {
 
-                Tools.showMessage(context , "deleted.");
+                FirebaseFirestore.getInstance()
+                        .collection(context.getString(R.string.firebase_charities))
+                        .document(donation.getCharityID())
+                        .collection(context.getString(R.string.firebase_donations))
+                        .document(donation.getDonationID()).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful())
+                        {
+                            Tools.showMessage(context , "Donation was Deleted.");
+                        }
+                    }
+                });
 
+
+
+            }
+        });
+        holder.loc_donation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(context, MapsActivity.class);
+                intent.putExtra("lat" ,donation.getLat());
+
+                intent.putExtra("lng" ,donation.getLng());
+
+                context.startActivity(intent);
             }
         });
 

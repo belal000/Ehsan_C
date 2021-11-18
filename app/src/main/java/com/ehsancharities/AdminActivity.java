@@ -1,4 +1,4 @@
-package com.ehsancharities.home;
+package com.ehsancharities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -15,7 +15,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.MenuItem;
@@ -24,27 +23,30 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.ehsancharities.MapsActivity;
-import com.ehsancharities.R;
+import com.ehsancharities.adapters.AdapterCharty;
 import com.ehsancharities.adapters.DonationsAdapter;
 import com.ehsancharities.firebase.FirebaseServices;
+import com.ehsancharities.home.MainActivity;
 import com.ehsancharities.login.LoginActivity;
 import com.ehsancharities.model.Charity;
 import com.ehsancharities.model.Donation;
 import com.ehsancharities.utils.Const;
 import com.ehsancharities.utils.Tools;
 import com.ehsancharities.utils.UniversalImageLoader;
-import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
@@ -57,47 +59,35 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-
-
-    // double click to exit from app.
-    boolean doubleBackToExitPressedOnce = false;
-
-    private static final String TAG = "MainActivity";
-
-    private FirebaseAuth firebaseAuth;
-    private FirebaseFirestore firebaseFirestore;
-    private DocumentReference documentReference;
-    private Charity charity;
-    private FirebaseServices firebaseServices;
-    private FirebaseStorage storage;
-    private StorageReference storageReference;
-    private DonationsAdapter adapter;
-
-    // Drawer Layout
-    private DrawerLayout drawerLayout;
+public class AdminActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+    RecyclerView rec_charty;
+    AdapterCharty adapterCharty;
+    private DrawerLayout drawer_layout_admin;
     private NavigationView navigationView;
     private TextView nameInHeader;
     private TextView emailInHeader;
     private ImageView profile_picture_header;
-    private ProgressBar loadDonations;
-    private RecyclerView donationsRecyclerView;
+    private ProgressBar loadCharity;
+
+    List<Charity> charityList;
+
+    private Toolbar admin_toolbar;
+
+    private FirebaseAuth firebaseAuth;
+    private FirebaseFirestore firebaseFirestore;
+    private DocumentReference documentReference;
+    private FirebaseServices firebaseServices;
+    private FirebaseStorage storage;
+    private StorageReference storageReference;
+    private Charity charity;
+    private static final String TAG = "MainActivity";
 
     private Uri filePath;
-    private List<Donation> donations;
-
-
-
-
-
-    // toolbar , show in the top page.
-    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
+        setContentView(R.layout.activity_admin);
         initWidgets();
         setupToolbar();
         setupDrawerLayout();
@@ -105,63 +95,42 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         checkCurrentUser();
 
 
-
     }
-
-
 
     private void initWidgets() {
-        donationsRecyclerView = findViewById(R.id.donations_recyvler_view);
-        loadDonations = findViewById(R.id.load_donations);
+        rec_charty = findViewById(R.id.rec_charty);
+
+        loadCharity = findViewById(R.id.loadCharity);
         Tools.setSystemBarColor(this, R.color.blue_grey_900);
-        Tools.initImageLoader(MainActivity.this);
-        setTitle(getString(R.string.app_name));
+        Tools.initImageLoader(AdminActivity.this);
+        setTitle("Admin Page");
     }
 
-    private void checkCurrentUser() {
-        firebaseAuth = FirebaseAuth.getInstance();
-        firebaseFirestore = FirebaseFirestore.getInstance();
-        storage = FirebaseStorage.getInstance();
-        storageReference = storage.getReference();
-        FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
-        if (firebaseUser == null) {
-            backToLogin();
-        } else {
-            initChairty(firebaseAuth.getCurrentUser().getUid());
-            loadDonations.setVisibility(View.VISIBLE);
-            getDonations();
-        }
+    private void setupToolbar() {
+        admin_toolbar = findViewById(R.id.admin_toolbar);
+        setSupportActionBar(admin_toolbar);
     }
 
-    private void getDonations() {
+    private void setupDrawerLayout() {
 
-        donations = new ArrayList<>();
+        // DrawerLayout in activity_main.xml
+        drawer_layout_admin = findViewById(R.id.drawer_layout_admin);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer_layout_admin, admin_toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
+            @Override
+            public void onDrawerClosed(View drawerView) {
 
-        firebaseFirestore.collection(getString(R.string.firebase_charities))
-                .document(firebaseAuth.getUid())
-                .collection(getString(R.string.firebase_donations))
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
+            }
 
-                        List<Donation> donationsList = queryDocumentSnapshots.toObjects(Donation.class);
+            @Override
+            public void onDrawerOpened(View drawerView) {
 
-                        loadDonations.setVisibility(View.GONE);
+            }
+        };
+        drawer_layout_admin.setDrawerListener(toggle);
+        toggle.syncState();
 
-                        setupRecyclerViewShops(donationsList);
-                    }
-                });
-    }
-
-    private void setupRecyclerViewShops(List<Donation> donationList) {
-
-        adapter = new DonationsAdapter(this, donationList);
-
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
-        donationsRecyclerView.setLayoutManager(mLayoutManager);
-        donationsRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        donationsRecyclerView.setAdapter(adapter);
-
+        navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
     }
 
     private void initChairty(String chairtyID) {
@@ -185,7 +154,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 } else {
                     if (charity == null) {
                         Tools.showMessage(getApplicationContext(), getString(R.string.you_are_not_charity));
-                        signOutMethod();
+                        //signOutMethod();
                     }
                 }
             }
@@ -206,74 +175,38 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
-    private void setupDrawerLayout() {
-
-        // DrawerLayout in activity_main.xml
-        drawerLayout = findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
-            @Override
-            public void onDrawerClosed(View drawerView) {
-
-            }
-
-            @Override
-            public void onDrawerOpened(View drawerView) {
-
-            }
-        };
-        drawerLayout.setDrawerListener(toggle);
-        toggle.syncState();
-
-        navigationView = findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-    }
-
-
     private void initFirebase() {
         firebaseServices = FirebaseServices.getFirebaseServicesInstance();
-        firebaseServices.setContext(MainActivity.this);
+        firebaseServices.setContext(AdminActivity.this);
     }
 
-    private void setupToolbar() {
-        toolbar = findViewById(R.id.home_toolbar);
-        setSupportActionBar(toolbar);
-    }
-
-    private void backToLogin() {
-        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-        startActivity(intent);
-        finish();
+    private void checkCurrentUser() {
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseFirestore = FirebaseFirestore.getInstance();
+        storage = FirebaseStorage.getInstance();
+        storageReference = storage.getReference();
+        FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+        if (firebaseUser == null) {
+            //backToLogin();
+        } else {
+            initChairty(firebaseAuth.getCurrentUser().getUid());
+            loadCharity.setVisibility(View.VISIBLE);
+            getCharty();
+        }
     }
 
     private void signOutMethod() {
         firebaseAuth.signOut();
-        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+        Intent intent = new Intent(AdminActivity.this, LoginActivity.class);
         startActivity(intent);
         this.finish();
     }
 
-    @Override
-    public void onBackPressed() {
+    private void setupRecyclerViewShops(List<Charity> charityList) {
 
-
-        if (doubleBackToExitPressedOnce) {
-            super.onBackPressed();
-            Intent a = new Intent(Intent.ACTION_MAIN);
-            a.addCategory(Intent.CATEGORY_HOME);
-            a.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(a);
-            return;
-        }
-        this.doubleBackToExitPressedOnce = true;
-        Tools.showMessage(MainActivity.this, getString(R.string.confrim_exit));
-
-        new Handler().postDelayed(new Runnable() {
-
-            @Override
-            public void run() {
-                doubleBackToExitPressedOnce = false;
-            }
-        }, 2000);
+        adapterCharty = new AdapterCharty(charityList, getBaseContext());
+        rec_charty.setLayoutManager(new LinearLayoutManager(getBaseContext()));
+        rec_charty.setAdapter(adapterCharty);
 
     }
 
@@ -283,9 +216,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int id = menuItem.getItemId();
 
         if (id == R.id.home) {
-            this.drawerLayout.closeDrawer(GravityCompat.START);
-        }
-        else if (id == R.id.set_profile_picture) {
+            this.drawer_layout_admin.closeDrawer(GravityCompat.START);
+        } else if (id == R.id.set_profile_picture) {
             chooseImage();
         }
 //        else if (id == R.id.set_profile_loc) {
@@ -302,15 +234,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //
 //        }
         else if (id == R.id.signout) {
-            this.drawerLayout.closeDrawer(GravityCompat.START);
+            this.drawer_layout_admin.closeDrawer(GravityCompat.START);
             signOutMethod();
         }
 
         return true;
     }
-
-
-
 
     private void chooseImage() {
         Intent intent = new Intent();
@@ -319,7 +248,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         startActivityForResult(Intent.createChooser(intent, "Select Picture"), Const.PICK_IMAGE_REQUEST);
     }
 
-    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == Const.PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
@@ -366,7 +294,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 @Override
                 public void onFailure(@NonNull Exception e) {
                     progressDialog.dismiss();
-                    Tools.showMessage(MainActivity.this, getString(R.string.failed) + " " + e.getMessage());
+                    Tools.showMessage(AdminActivity.this, getString(R.string.failed) + " " + e.getMessage());
                 }
             }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
                 @Override
@@ -376,6 +304,40 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             });
         }
+
+
+    }
+
+    private void getCharty() {
+
+        charityList = new ArrayList<>();
+
+
+        Query query = FirebaseFirestore.getInstance().collection(getString(R.string.firebase_charities)).whereEqualTo("stateAccount", 0);
+
+
+        query.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+
+                for (DocumentChange documentChange : queryDocumentSnapshots.getDocumentChanges()) {
+
+
+                    if (documentChange.getType() == DocumentChange.Type.ADDED) {
+
+
+                        Charity charity = documentChange.getDocument().toObject(Charity.class);
+
+                        charityList.add(charity);
+                        setupRecyclerViewShops(charityList);
+                        adapterCharty.notifyDataSetChanged();
+                    }
+
+
+                }
+                loadCharity.setVisibility(View.GONE);
+            }
+        });
 
 
     }
